@@ -1,8 +1,9 @@
 <?php
 
-trait FastMigrator
+use Illuminate\Database\Migrations\Migration;
+
+class FastMigrator extends Migration
 {
-    //public $I = $this;
     protected $tables = [];
     protected $curr_table_name = '';
 

@@ -1,0 +1,23 @@
+{
+    "name": "lawrence/fast-migrate",
+    "description": "Migrate even faster!",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lawrence Wakefield",
+            "email": "lawrence@iamlawrence.me"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/database": "~5.0"
+    },
+    "require-dev": {
+        "codeception/codeception": "*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Lawrence\\FastMigrate": "src/"
+        }
+    }
+}
