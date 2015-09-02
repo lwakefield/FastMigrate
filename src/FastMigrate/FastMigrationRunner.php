@@ -1,6 +1,9 @@
 <?php
 
+namespace FastMigrate;
+
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class FastMigrationRunner {
 
@@ -42,15 +45,15 @@ class FastMigrationRunner {
     {
         foreach ($this->bufferedAttributeMigrations as $table_name => $migrations) {
             Schema::create($table_name, function (Blueprint $table) use ($migrations) {
-                $table->increments('id');
-                $table->timestamps();
+                //$table->increments('id');
+                //$table->timestamps();
 
-                foreach ($migrations as $key => $columns) {
-                    $type = strtolower(str_singular(str_replace('with', '', $key)));
-                    foreach ($columns as $column_name) {
-                        $table->$type($column_name);
-                    }
-                }
+                //foreach ($migrations as $key => $columns) {
+                    //$type = strtolower(str_singular(str_replace('with', '', $key)));
+                    //foreach ($columns as $column_name) {
+                        //$table->$type($column_name);
+                    //}
+                //}
             });
         }
     }
@@ -62,19 +65,19 @@ class FastMigrationRunner {
                 return ends_with($key, 'Many');
             }));
             foreach ($many_relations as $relation) {
-                Schema::table($relation, function (Blueprint $table) use ($table_name, $relation) {
-                    $table->integer(str_singular($table_name).'_id');
-                });
+                //Builder::table($relation, function (Blueprint $table) use ($table_name, $relation) {
+                    //$table->integer(str_singular($table_name).'_id');
+                //});
             }
 
             $one_relations = array_flatten(array_where($migrations, function($key, $val) {
                 return ends_with($key, 'One');
             }));
-            Schema::table($table_name, function (Blueprint $table) use ($one_relations) {
-                foreach ($one_relations as $relation) {
-                    $table->integer(str_singular($relation).'_id');
-                }
-            });
+            //Builder::table($table_name, function (Blueprint $table) use ($one_relations) {
+                //foreach ($one_relations as $relation) {
+                    //$table->integer(str_singular($relation).'_id');
+                //}
+            //});
         }
     }
 
