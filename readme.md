@@ -2,7 +2,7 @@
 
 Migrate even faster with FastMigrate! FastMigrate is essentially a wrapper around Laravels migration class. FastMigrate aims to make creating tables easier and faster.
 
-FastMigrate requires Laravel >= 5.0.
+FastMigrate requires Laravel >= 5.0
 
 ## Installation
 
@@ -18,7 +18,7 @@ An example of FastMigrate in use is shown below.
 use FastMigrate\FastMigrator;
 use Schema;
 
-class ExampleMigration extends FastMigrate
+class ExampleMigration extends FastMigrator
 {
 
     public function up()
@@ -32,7 +32,7 @@ class ExampleMigration extends FastMigrate
 
         $I->wantATable('posts')
             ->withStrings('title', 'content')
-            ->withInteger('score');
+            ->withIntegers('score');
 
         $I->want('users')
             ->toHaveMany('posts');
