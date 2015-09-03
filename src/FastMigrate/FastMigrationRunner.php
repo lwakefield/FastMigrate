@@ -38,7 +38,7 @@ class FastMigrationRunner {
 
     private function isRelation($key)
     {
-        return starts_with($key, 'toHave') || starts_with($key, 'toMorphMany');
+        return starts_with($key, 'toHave');
     }
 
     private function runBufferedAttributeMigrations()
