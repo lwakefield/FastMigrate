@@ -10,11 +10,11 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/database": "~5.0"
+        "illuminate/database": "5.*"
     },
     "require-dev": {
-        "laravel/laravel": "~5.0",
-        "codeception/codeception": "*"
+        "laravel/laravel": "5.*",
+        "codeception/codeception": "2.*"
     },
     "autoload": {
         "psr-4": {
