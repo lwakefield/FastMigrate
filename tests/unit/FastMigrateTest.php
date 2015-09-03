@@ -31,9 +31,42 @@ class FastMigrateTest extends Illuminate\Foundation\Testing\TestCase
     public function testCanCreateTable()
     {
         $I = $this->getMockForAbstractClass('FastMigrate\FastMigrator');
-        $I->wantATable('flights');
+        $I->wantATable('users')->
+            amReadyForMigration();
+
+        $this->assertTrue(Schema::hasTable('users'));
+    }
+
+    public function testCanCreateColumn()
+    {
+        $I = $this->getMockForAbstractClass('FastMigrate\FastMigrator');
+        $I->wantATable('users')
+            ->withStrings('username', 'password')
+            ->amReadyForMigration();
+
+        $this->assertTrue(Schema::hasColumns('users', ['username', 'password']));
+    }
+
+    public function testCanCreateRelationToOne()
+    {
+        $I = $this->getMockForAbstractClass('FastMigrate\FastMigrator');
+        $I->wantATable('users')
+            ->toHaveOne('roles');
+        $I->wantATable('roles');
         $I->amReadyForMigration();
 
-        $this->assertTrue(Schema::hasTable('flights'));
+        $this->assertTrue(Schema::hasColumns('users', ['role_id']));
+    }
+    
+    
+    public function testCanCreateRelationToMany()
+    {
+        $I = $this->getMockForAbstractClass('FastMigrate\FastMigrator');
+        $I->wantATable('users')
+            ->toHaveMany('posts');
+        $I->wantATable('posts');
+        $I->amReadyForMigration();
+
+        $this->assertTrue(Schema::hasColumns('posts', ['user_id']));
     }
 }

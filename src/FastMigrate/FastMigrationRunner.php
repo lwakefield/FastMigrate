@@ -65,19 +65,23 @@ class FastMigrationRunner {
                 return ends_with($key, 'Many');
             }));
             foreach ($many_relations as $relation) {
-                //Builder::table($relation, function (Blueprint $table) use ($table_name, $relation) {
-                    //$table->integer(str_singular($table_name).'_id');
-                //});
+                Schema::table($relation, function (\Illuminate\Database\Schema\Blueprint $table) use ($table_name, $relation) {
+                    $table->
+                        integer(str_singular($table_name).'_id')->
+                        default(-1);
+                });
             }
 
             $one_relations = array_flatten(array_where($migrations, function($key, $val) {
                 return ends_with($key, 'One');
             }));
-            //Builder::table($table_name, function (Blueprint $table) use ($one_relations) {
-                //foreach ($one_relations as $relation) {
-                    //$table->integer(str_singular($relation).'_id');
-                //}
-            //});
+            Schema::table($table_name, function (\Illuminate\Database\Schema\Blueprint $table) use ($one_relations) {
+                foreach ($one_relations as $relation) {
+                    $table->
+                        integer(str_singular($relation).'_id')->
+                        default(-1);
+                }
+            });
         }
     }
 
