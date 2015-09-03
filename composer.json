@@ -1,5 +1,7 @@
 {
     "name": "lawrence/fast-migrate",
+    "type": "library",
+    "keywords": ["laravel", "framework", "migration", "database", "sql"],
     "description": "Migrate even faster!",
     "license": "MIT",
     "authors": [
