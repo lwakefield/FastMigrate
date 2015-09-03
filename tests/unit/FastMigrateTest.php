@@ -15,8 +15,10 @@ class FastMigrateTest extends Illuminate\Foundation\Testing\TestCase
         return $app;
     }
 
-    public function testCanCreateTable()
+    public function setUp()
     {
+        parent::setUp();
+
         $this->app['config']->set('database.default', 'testing');
 
         $this->app['config']->set('database.connections.testing', array(
@@ -24,7 +26,10 @@ class FastMigrateTest extends Illuminate\Foundation\Testing\TestCase
             'database' => ':memory:',
             'prefix'   => '',
         ));
+    }
 
+    public function testCanCreateTable()
+    {
         $I = $this->getMockForAbstractClass('FastMigrate\FastMigrator');
         $I->wantATable('flights');
         $I->amReadyForMigration();
