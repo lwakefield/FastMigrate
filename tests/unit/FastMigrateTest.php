@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Facade;
+use FastMigrate\FastMigrator;
 
 class FastMigrateTest extends Illuminate\Foundation\Testing\TestCase
 {
@@ -14,7 +15,7 @@ class FastMigrateTest extends Illuminate\Foundation\Testing\TestCase
         return $app;
     }
 
-    public function testMe()
+    public function testCanCreateTable()
     {
         $this->app['config']->set('database.default', 'testing');
 
@@ -24,12 +25,10 @@ class FastMigrateTest extends Illuminate\Foundation\Testing\TestCase
             'prefix'   => '',
         ));
 
-        Schema::create('flights', function (\Illuminate\Database\Schema\Blueprint $table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->string('airline');
-            $table->timestamps();
-        });
-        dd(Schema::hasTable('flights'));
+        $I = $this->getMockForAbstractClass('FastMigrate\FastMigrator');
+        $I->wantATable('flights');
+        $I->amReadyForMigration();
+
+        $this->assertTrue(Schema::hasTable('flights'));
     }
 }

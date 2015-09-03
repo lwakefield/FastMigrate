@@ -2,8 +2,8 @@
 
 namespace FastMigrate;
 
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+//use Illuminate\Database\Schema\Blueprint;
+use Schema;
 
 class FastMigrationRunner {
 
@@ -44,16 +44,16 @@ class FastMigrationRunner {
     private function runBufferedAttributeMigrations()
     {
         foreach ($this->bufferedAttributeMigrations as $table_name => $migrations) {
-            Schema::create($table_name, function (Blueprint $table) use ($migrations) {
-                //$table->increments('id');
-                //$table->timestamps();
+            Schema::create($table_name, function (\Illuminate\Database\Schema\Blueprint $table) use ($migrations) {
+                $table->increments('id');
+                $table->timestamps();
 
-                //foreach ($migrations as $key => $columns) {
-                    //$type = strtolower(str_singular(str_replace('with', '', $key)));
-                    //foreach ($columns as $column_name) {
-                        //$table->$type($column_name);
-                    //}
-                //}
+                foreach ($migrations as $key => $columns) {
+                    $type = strtolower(str_singular(str_replace('with', '', $key)));
+                    foreach ($columns as $column_name) {
+                        $table->$type($column_name);
+                    }
+                }
             });
         }
     }
