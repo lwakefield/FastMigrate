@@ -38,7 +38,7 @@ class FastMigrationRunner {
 
     private function isRelation($key)
     {
-        return starts_with($key, 'toHave');
+        return starts_with($key, ['toHave', 'morphsTo']);
     }
 
     private function runBufferedAttributeMigrations()
@@ -61,28 +61,37 @@ class FastMigrationRunner {
     private function runBufferedRelationMigrations()
     {
         foreach ($this->bufferedRelationMigrations as $table_name => $migrations) {
-            $many_relations = array_flatten(array_where($migrations, function($key, $val) {
-                return ends_with($key, 'Many');
-            }));
-            foreach ($many_relations as $relation) {
-                Schema::table($relation, function (\Illuminate\Database\Schema\Blueprint $table) use ($table_name, $relation) {
-                    $table->
-                        integer(str_singular($table_name).'_id')->
-                        default(-1);
-                });
-            }
-
-            $one_relations = array_flatten(array_where($migrations, function($key, $val) {
-                return ends_with($key, 'One');
-            }));
-            Schema::table($table_name, function (\Illuminate\Database\Schema\Blueprint $table) use ($one_relations) {
-                foreach ($one_relations as $relation) {
-                    $table->
-                        integer(str_singular($relation).'_id')->
-                        default(-1);
-                }
-            });
+            $this->runToManyMigrations($table_name, $migrations);
+            $this->runToOneMigrations($table_name, $migrations);
         }
     }
 
+    private function runToManyMigrations($table_name, $migrations)
+    {
+        $many_relations = array_flatten(array_where($migrations, function($key, $val) {
+            return ends_with($key, 'Many');
+        }));
+        foreach ($many_relations as $relation) {
+            Schema::table($relation, function (\Illuminate\Database\Schema\Blueprint $table) use ($table_name, $relation) {
+                $table->
+                    integer(str_singular($table_name).'_id')->
+                    default(-1);
+            });
+        }
+    }
+    
+    private function runToOneMigrations($table_name, $migrations)
+    {
+        $one_relations = array_flatten(array_where($migrations, function($key, $val) {
+            return ends_with($key, 'One');
+        }));
+        Schema::table($table_name, function (\Illuminate\Database\Schema\Blueprint $table) use ($one_relations) {
+            foreach ($one_relations as $relation) {
+                $table->
+                    integer(str_singular($relation).'_id')->
+                    default(-1);
+            }
+        });
+    }
+    
 }
