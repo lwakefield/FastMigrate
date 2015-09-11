@@ -14,9 +14,20 @@ class FastMigrationRunner {
     public function run($tables)
     {
         $this->tables = $tables;
+        $this->makeTables();
         $this->bufferMigrations();
         $this->runBufferedAttributeMigrations();
         $this->runBufferedRelationMigrations();
+    }
+
+    private function makeTables()
+    {
+        foreach ($this->tables as $table_name => $val) {
+            Schema::create($table_name, function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->increments('id');
+                $table->timestamps();
+            });
+        }
     }
 
     public function bufferMigrations()
@@ -44,14 +55,11 @@ class FastMigrationRunner {
     private function runBufferedAttributeMigrations()
     {
         foreach ($this->bufferedAttributeMigrations as $table_name => $migrations) {
-            Schema::create($table_name, function (\Illuminate\Database\Schema\Blueprint $table) use ($migrations) {
-                $table->increments('id');
-                $table->timestamps();
-
+            Schema::table($table_name, function (\Illuminate\Database\Schema\Blueprint $table) use ($migrations) {
                 foreach ($migrations as $key => $columns) {
                     $type = strtolower(str_singular(str_replace('with', '', $key)));
                     foreach ($columns as $column_name) {
-                        $table->$type($column_name);
+                        $table->$type($column_name)->nullable();
                     }
                 }
             });
