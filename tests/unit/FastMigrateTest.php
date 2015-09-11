@@ -69,4 +69,16 @@ class FastMigrateTest extends Illuminate\Foundation\Testing\TestCase
 
         $this->assertTrue(Schema::hasColumns('posts', ['user_id']));
     }
+
+    public function testCanCreateManyToMany()
+    {
+        $I = $this->getMockForAbstractClass('FastMigrate\FastMigrator');
+        $I->wantATable('posts')
+            ->manyToMany('tags');
+        $I->wantATable('tags');
+        $I->amReadyForMigration();
+
+        $this->assertTrue(Schema::hasColumns('post_tag', ['post_id', 'tag_id']));
+    }
+    
 }

@@ -2,7 +2,7 @@
 
 namespace FastMigrate;
 
-//use Illuminate\Database\Schema\Blueprint;
+use \Illuminate\Database\Schema\Blueprint;
 use Schema;
 
 class FastMigrationRunner {
@@ -23,7 +23,7 @@ class FastMigrationRunner {
     private function makeTables()
     {
         foreach ($this->tables as $table_name => $val) {
-            Schema::create($table_name, function (\Illuminate\Database\Schema\Blueprint $table) {
+            Schema::create($table_name, function (Blueprint $table) {
                 $table->increments('id');
                 $table->timestamps();
             });
@@ -49,13 +49,13 @@ class FastMigrationRunner {
 
     private function isRelation($key)
     {
-        return starts_with($key, ['toHave', 'morphsTo']);
+        return starts_with($key, ['toHave', 'morphsTo', 'manyToMany']);
     }
 
     private function runBufferedAttributeMigrations()
     {
         foreach ($this->bufferedAttributeMigrations as $table_name => $migrations) {
-            Schema::table($table_name, function (\Illuminate\Database\Schema\Blueprint $table) use ($migrations) {
+            Schema::table($table_name, function (Blueprint $table) use ($migrations) {
                 foreach ($migrations as $key => $columns) {
                     $type = strtolower(str_singular(str_replace('with', '', $key)));
                     foreach ($columns as $column_name) {
@@ -69,18 +69,31 @@ class FastMigrationRunner {
     private function runBufferedRelationMigrations()
     {
         foreach ($this->bufferedRelationMigrations as $table_name => $migrations) {
+            $this->runManyToManyMigrations($table_name, $migrations);
             $this->runToManyMigrations($table_name, $migrations);
             $this->runToOneMigrations($table_name, $migrations);
         }
     }
 
+    private function runManyToManyMigrations($table_name, $migrations)
+    {
+        $relations = $this->getRelations($migrations, 'manyToMany');
+        foreach ($relations as $relation) {
+            $name_a = str_singular($table_name);
+            $name_b = str_singular($relation);
+            $relation_table_name = $name_a.'_'.$name_b;
+            Schema::create($relation_table_name, function (Blueprint $table) use ($name_a, $name_b) {
+                $table->integer($name_a.'_id');
+                $table->integer($name_b.'_id');
+            });
+        }
+    }
+
     private function runToManyMigrations($table_name, $migrations)
     {
-        $many_relations = array_flatten(array_where($migrations, function($key, $val) {
-            return ends_with($key, 'Many');
-        }));
-        foreach ($many_relations as $relation) {
-            Schema::table($relation, function (\Illuminate\Database\Schema\Blueprint $table) use ($table_name, $relation) {
+        $relations = $this->getRelations($migrations, 'toHaveMany');
+        foreach ($relations as $relation) {
+            Schema::table($relation, function (Blueprint $table) use ($table_name, $relation) {
                 $table->
                     integer(str_singular($table_name).'_id')->
                     default(-1);
@@ -90,16 +103,22 @@ class FastMigrationRunner {
     
     private function runToOneMigrations($table_name, $migrations)
     {
-        $one_relations = array_flatten(array_where($migrations, function($key, $val) {
-            return ends_with($key, 'One');
-        }));
-        Schema::table($table_name, function (\Illuminate\Database\Schema\Blueprint $table) use ($one_relations) {
-            foreach ($one_relations as $relation) {
+        $relations = $this->getRelations($migrations, 'toHaveOne');
+        Schema::table($table_name, function (Blueprint $table) use ($relations) {
+            foreach ($relations as $relation) {
                 $table->
                     integer(str_singular($relation).'_id')->
                     default(-1);
             }
         });
     }
+
+    private function getRelations($migrations, $type)
+    {
+        return array_flatten(array_where($migrations, function($key, $val) use ($type) {
+            return ends_with($key, $type);
+        }));
+    }
+    
     
 }
