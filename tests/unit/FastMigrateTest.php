@@ -51,11 +51,11 @@ class FastMigrateTest extends Illuminate\Foundation\Testing\TestCase
     {
         $I = $this->getMockForAbstractClass('FastMigrate\FastMigrator');
         $I->wantATable('users')
-            ->toHaveOne('roles');
-        $I->wantATable('roles');
+            ->toHaveOne('profiles');
+        $I->wantATable('profiles');
         $I->amReadyForMigration();
 
-        $this->assertTrue(Schema::hasColumns('users', ['role_id']));
+        $this->assertTrue(Schema::hasColumns('profiles', ['user_id']));
     }
     
     

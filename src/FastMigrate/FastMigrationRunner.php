@@ -104,13 +104,13 @@ class FastMigrationRunner {
     private function runToOneMigrations($table_name, $migrations)
     {
         $relations = $this->getRelations($migrations, 'toHaveOne');
-        Schema::table($table_name, function (Blueprint $table) use ($relations) {
-            foreach ($relations as $relation) {
+        foreach ($relations as $relation) {
+            Schema::table($relation, function (Blueprint $table) use ($table_name, $relation) {
                 $table->
-                    integer(str_singular($relation).'_id')->
+                    integer(str_singular($table_name).'_id')->
                     default(-1);
-            }
-        });
+            });
+        }
     }
 
     private function getRelations($migrations, $type)
