@@ -58,6 +58,16 @@ class FastMigrateTest extends Illuminate\Foundation\Testing\TestCase
         $this->assertTrue(Schema::hasColumns('profiles', ['user_id']));
     }
     
+    public function testCanCreateRelationBelongsTo()
+    {
+        $I = $this->getMockForAbstractClass('FastMigrate\FastMigrator');
+        $I->wantATable('users')
+            ->belongsTo('roles');
+        $I->wantATable('roles');
+        $I->amReadyForMigration();
+
+        $this->assertTrue(Schema::hasColumns('users', ['role_id']));
+    }
     
     public function testCanCreateRelationToMany()
     {

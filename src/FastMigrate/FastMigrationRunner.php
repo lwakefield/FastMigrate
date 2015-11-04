@@ -49,7 +49,7 @@ class FastMigrationRunner {
 
     private function isRelation($key)
     {
-        return starts_with($key, ['toHave', 'morphsTo', 'manyToMany']);
+        return starts_with($key, ['belongsTo', 'toHave', 'morphsTo', 'manyToMany']);
     }
 
     private function runBufferedAttributeMigrations()
@@ -72,6 +72,7 @@ class FastMigrationRunner {
             $this->runManyToManyMigrations($table_name, $migrations);
             $this->runToManyMigrations($table_name, $migrations);
             $this->runToOneMigrations($table_name, $migrations);
+            $this->runBelongsToMigrations($table_name, $migrations);
         }
     }
 
@@ -112,6 +113,18 @@ class FastMigrationRunner {
             });
         }
     }
+
+     private function runBelongsToMigrations($table_name, $migrations)
+     {
+         $relations = $this->getRelations($migrations, 'belongsTo');
+         Schema::table($table_name, function (Blueprint $table) use ($relations) {
+             foreach ($relations as $relation) {
+                 $table->
+                     integer(str_singular($relation).'_id')->
+                     default(-1);
+             }
+         });
+     }
 
     private function getRelations($migrations, $type)
     {
